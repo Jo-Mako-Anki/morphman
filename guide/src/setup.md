@@ -1,4 +1,4 @@
-# Setup
+# Settings
 
 **Tools > MorphMan > Settings** (Ctrl+O).
 
@@ -51,7 +51,7 @@ Changing a Parsing or Review option makes the next Recalc go over every note.
 
 ## Words to learn
 
-For the **Words to learn** window. See [Readability](usage/readability.md).
+For the **Words to learn** window. See [Readability](words/index.md).
 
 - **Examples**: the Example column shows a sentence from your own cards, for each word. The one where it's the only unknown word, from a mature card if possible, then the shortest. Set the minimum length here.
 - **Part of Speech Names**: how the types of words are called. **Edit names…** to change them, **Suggested names** for English ones.

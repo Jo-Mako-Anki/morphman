@@ -12,7 +12,7 @@ MorphMan keeps your words in `.db` files, in your profile's `dbs` folder:
 | `mature.db` | The words you know well (21 days). |
 | `priority.db` | Words you want to learn first. You make it. |
 | `external.db` | Words you know from somewhere else. You make it. |
-| `learning_order.txt` | The order to learn words. See [learning_order.txt](learning-order.md). |
+| `learning_order.txt` | The order to learn words. See [learning_order.txt](../tables/learning-order.md). |
 
 Recalc makes the first four.
 

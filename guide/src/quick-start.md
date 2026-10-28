@@ -78,7 +78,7 @@ No selection? The buttons use every word shown.
 
 Then, 3 choices:
 
-- **Add to deck**: makes the cards. A sentence from your own cards when there is one, with its sound and picture. Otherwise, a vocab card. See [Adding words to a deck](usage/add-to-deck.md).
+- **Add to deck**: makes the cards. A sentence from your own cards when there is one, with its sound and picture. Otherwise, a vocab card. See [Adding words to a deck](words/add-cards.md).
 - **Update learning_order.txt…**: at the next Recalc, your cards that teach these words come first.
 - **Export .txt…**: saves the words as a file, to import in Anki with **File > Import**.
 

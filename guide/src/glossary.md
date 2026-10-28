@@ -16,7 +16,7 @@ How well you know a morph, from the cards it is on:
 - **Known**: on a card you have answered correctly at least once, even if it is still in learning (an interval of a few seconds is enough).
 - **Mature**: on a card with an interval of at least 21 days, like in Anki.
 
-You can change these thresholds. See [Setup](setup.md).
+You can change these thresholds. See [Settings](setup.md).
 
 ## k+1
 
@@ -77,7 +77,7 @@ One big list of Japanese words, the most common first. It is used to rank words,
 
 ## learning_order.txt
 
-Your own list of words to learn, in order. MorphMan uses it to sort your new cards. See [learning_order.txt and the Master list](usage/learning-order.md).
+Your own list of words to learn, in order. MorphMan uses it to sort your new cards. See [learning_order.txt and the Master list](readability/study-plan.md).
 
 ## Known database (known.db)
 

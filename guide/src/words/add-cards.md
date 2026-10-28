@@ -1,4 +1,4 @@
-# Adding words to a deck
+# Add Cards
 
 In **Words to learn**, select the words you want, then click **Add to deck**.
 

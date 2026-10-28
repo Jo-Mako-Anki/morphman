@@ -19,7 +19,7 @@ A line of **Analyze Cards > Identify Cards** has a note type but no field. Pick 
 
 - Is the card with this word read by Recalc? Check its note type and field in [Analyze Cards](analyze-cards/identify-cards.md).
 - Have you reviewed the card at least once?
-- Spelling: with **Match the spelling** on, 言う and いう are two words. See [Setup > Parsing](setup.md#parsing).
+- Spelling: with **Match the spelling** on, 言う and いう are two words. See [Settings > Parsing](setup.md#parsing).
 
 You know it from somewhere else? Press **K** on its card while you study, or add the `mm_AK` tag.
 
