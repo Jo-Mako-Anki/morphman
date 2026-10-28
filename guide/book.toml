@@ -7,3 +7,5 @@ src = "src"
 [output.html]
 git-repository-url = "https://github.com/Jo-Mako-Anki/morphman"
 edit-url-template = "https://github.com/Jo-Mako-Anki/morphman/edit/main/guide/{path}"
+additional-css = ["custom.css"]
+additional-js = ["custom.js"]
