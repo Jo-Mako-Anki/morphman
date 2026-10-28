@@ -6,6 +6,7 @@ I decided to update the add-on for compatibility, bundle it with my personal fil
 Credit goes to those who made MorphMan what it was before this version (https://github.com/kaegi/MorphMan and later https://github.com/ianki).
 
 This guide explains how to use the new version, for long-time users and newcomers alike.
+
 ## Why use MorphMan?
 
 MorphMan reads the Japanese in your Anki cards and works out which words you know.
@@ -19,11 +20,13 @@ With that, you can:
 
 The next page is a quick start, to get going as fast as possible.
 The rest of the guide goes into detail, step by step.
+
 ## Good to know
 
 - It's free, and it will stay free. No account, no subscription.
 - The Japanese dictionary (MecabUnidic, about 500 MB) is too big for AnkiWeb. MorphMan downloads it for you the first time you start it.
 - It can work with other languages, but the focus is on Japanese.
+- 
 ## Questions
 
 If something is unclear or doesn't work, come and ask on my [Discord](https://discord.gg/J9Sw8jdkPY).
