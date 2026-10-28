@@ -10,8 +10,6 @@ The cards come in the order of the table. Sorted by **Order**, they follow the t
 
 MorphMan asks where the cards go and what they are.
 
-![Add to deck window](../img/add_to_deck_dialog.png)
-
 Check **Remember**, and next time it's one click. To change the settings, click **▾** next to **Add to deck**.
 
 **Save** keeps the settings without adding cards.
@@ -33,7 +31,7 @@ So you learn the word from a real sentence of an anime or a game.
 
 No sentence for a word? It gets a vocab card instead.
 
-MorphMan only looks in the cards counted in [Analyze Cards](analyze-cards.md).
+MorphMan only looks in the cards counted in [Analyze Cards](../analyze-cards/identify-cards.md).
 
 ### Vocab cards only
 

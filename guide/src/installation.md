@@ -45,4 +45,4 @@ Your databases (known words, `priority.db`, `external.db`…) are in your profil
 
 ## Next
 
-Tell MorphMan which cards to read: [Analyze Cards](usage/analyze-cards.md).
+Tell MorphMan which cards to read: [Analyze Cards](analyze-cards/index.md).

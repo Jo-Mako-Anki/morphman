@@ -2,13 +2,13 @@
 
 ## Recalc
 
-**Ctrl+M**, or **Tools > MorphMan > Recalc**, or the **Recalc** button of [Analyze Cards](analyze-cards.md).
+**Ctrl+M**, or **Tools > MorphMan > Recalc**, or the **Recalc** button of Analyze Cards.
 
 MorphMan:
 
-1. Reads the cards set in Analyze Cards.
+1. Reads the cards set in [Identify Cards](identify-cards.md).
 2. Works out which words you know, from your reviews.
-3. Writes the fields and tags of the cards on **Modify** or **Reorder**.
+3. Writes the fields and tags of the cards on **Modify** or **Reorder** (see [Modify Cards](modify-cards.md)).
 4. Sorts the new cards on **Reorder**: the k+1 cards first.
 
 "Finished Recalc" shows at the end.
@@ -29,7 +29,7 @@ A Recalc only goes over:
 Goes over every note. You rarely need it. Recalc does a full one by itself:
 
 - the first time,
-- when you change a setting that changes what Recalc writes (Parsing, Review, Analyze Cards…),
+- when you change a setting that changes what Recalc writes (Parsing, Review, [Identify Cards](identify-cards.md)…),
 - when `learning_order.txt`, `priority.db` or `external.db` changes,
 - once a week. How often each word appears in your collection counts in the order, and it changes a little with each new note.
 

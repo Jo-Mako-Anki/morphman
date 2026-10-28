@@ -22,8 +22,6 @@ Open the **Analyze Cards** tab.
 
 In **Identify Cards**, add a line for your Japanese note type and pick the field with the Japanese sentence.
 
-![Identify Cards tab](img/quickstart_identify_cards.png)
-
 Choose what MorphMan does with these cards:
 
 - **Count Words**: it only learns which words you know.
@@ -39,8 +37,6 @@ Use **Populate Fields** to link the MorphMan fields you want to the fields of yo
 
 You can also rename the tags in the **Add Tags** section. Leave a tag empty if you don't want it.
 
-![Modify Cards tab](img/quickstart_modify_cards.png)
-
 ## 4. Run Recalc
 
 Click **Recalc**, or press **Ctrl+M**.
@@ -51,8 +47,6 @@ Open the **Readability** tab.
 
 Check the media you're interested in. It can take a minute, so maybe pick only one the first time.
 
-![Compare Media](img/quickstart_compare.png)
-
 You get a lot of data, but mainly:
 
 - **Known Instances %**: how much of the text you already know.
@@ -61,16 +55,12 @@ You get a lot of data, but mainly:
 - **Anki Deck**: a direct link to download a premade deck with all the sentences.
 - **Done**: to filter out the titles you've already studied or aren't interested in.
 
-![Readability results](img/quickstart_results.png)
-
 ## 6. Study Plan
 
 You can filter the words you want to learn by two factors:
 
 - **Rank limit**: to focus on the most frequent words.
 - **Target readability**: to set how much you want to understand.
-
-![Study Plan](img/quickstart_study.png)
 
 ## 7. Words to Learn
 
@@ -92,4 +82,3 @@ Then, 3 choices:
 - **Update learning_order.txt…**: at the next Recalc, your cards that teach these words come first.
 - **Export .txt…**: saves the words as a file, to import in Anki with **File > Import**.
 
-![Words to learn](img/quickstart_words.png)

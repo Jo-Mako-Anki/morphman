@@ -17,7 +17,7 @@ A line of **Analyze Cards > Identify Cards** has a note type but no field. Pick 
 
 ## A word I know counts as unknown
 
-- Is the card with this word read by Recalc? Check its note type and field in [Analyze Cards](usage/analyze-cards.md).
+- Is the card with this word read by Recalc? Check its note type and field in [Analyze Cards](analyze-cards/identify-cards.md).
 - Have you reviewed the card at least once?
 - Spelling: with **Match the spelling** on, 言う and いう are two words. See [Setup > Parsing](setup.md#parsing).
 

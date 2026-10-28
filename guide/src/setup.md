@@ -4,8 +4,6 @@
 
 The defaults are fine to start. Come here when you want to change something.
 
-![Settings tab](img/settings.png)
-
 The tab has 6 sections. Click a section to open or close it.
 
 ## Files

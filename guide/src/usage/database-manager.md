@@ -34,8 +34,6 @@ Want several? Merge them first with the Database Manager (**Union**), and save t
 
 **Tools > MorphMan > Database Manager** (Ctrl+D).
 
-![Database Manager](../img/database_manager.png)
-
 - **Browse for DB A**, **Browse for DB B**: open two databases.
 - **A**: shows the words of A.
 - **A-B**: the words of A that are not in B.

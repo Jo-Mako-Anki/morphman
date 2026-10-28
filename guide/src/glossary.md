@@ -36,7 +36,7 @@ The scan that reads your collection, finds what you know, fills the MorphMan fie
 
 To be quick, Recalc only goes over the notes that changed since the last one, and the notes with a word you learned since.
 
-**Full Recalc** (Ctrl+Shift+M) goes over every note. You rarely need it: Recalc does a full one by itself the first time, when you change a setting or `learning_order.txt`, and once a week. See [Recalc and Full Recalc](usage/recalc.md).
+**Full Recalc** (Ctrl+Shift+M) goes over every note. You rarely need it: Recalc does a full one by itself the first time, when you change a setting or `learning_order.txt`, and once a week. See [Recalc and Full Recalc](analyze-cards/recalc.md).
 
 ## Title
 

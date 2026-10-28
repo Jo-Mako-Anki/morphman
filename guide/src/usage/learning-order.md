@@ -10,8 +10,6 @@ The ones you'll meet the most. MorphMan writes them, in order, in `learning_orde
 
 A section of the **Readability** tab. Turn it on with its switch.
 
-![Study Plan](../img/study_plan.png)
-
 ### Master Frequency List
 
 A list of words, the most frequent first. MorphMan comes with one: `Master_All.txt`. See [Readability Files](../readability-files.md).

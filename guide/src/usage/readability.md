@@ -4,8 +4,6 @@
 
 This tab shows how much of a media you can read with the words you already know.
 
-![Readability tab](../img/readability_tab.png)
-
 ## Pick what to analyze
 
 ### Compare Media
@@ -79,8 +77,6 @@ You get the unknown words of the title, the most frequent first. Two tabs: **Wor
 
 ### Words
 
-![Words tab](../img/readability_words.png)
-
 Filters, at the top:
 
 - **Types**: only some types of words (nouns, verbs, particles…).
@@ -117,8 +113,6 @@ Double-click a word to see its k+1 cards in the Browser. Shift + double-click: e
 Select cells and press **Ctrl+C** to copy them.
 
 ### Coverage
-
-![Coverage tab](../img/readability_coverage.png)
 
 How many words you need to reach 80, 85, 90, 95 or 98 %.
 

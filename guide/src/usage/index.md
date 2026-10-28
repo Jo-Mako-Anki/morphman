@@ -13,8 +13,8 @@ Everything is in **Tools > MorphMan**:
 
 The usual way:
 
-1. [Analyze Cards](analyze-cards.md): tell MorphMan which cards to read.
-2. [Recalc](recalc.md): count your words and sort your new cards.
+1. [Analyze Cards](../analyze-cards/index.md): tell MorphMan which cards to read.
+2. [Recalc](../analyze-cards/recalc.md): count your words and sort your new cards.
 3. [Readability](readability.md): find media at your level.
 4. [Add to deck](add-to-deck.md): turn the words you're missing into cards.
 5. Study. Recalc again from time to time.
