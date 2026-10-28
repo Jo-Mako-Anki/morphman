@@ -27,23 +27,17 @@ In **Identify Cards**, add a line for your Japanese note type and pick the field
 Choose what MorphMan does with these cards:
 
 - **Count Words**: it only learns which words you know.
-
-Ex: A premade deck teaching you the most common vocabulary.
-
+  Example: a premade deck that teaches the most common vocabulary.
 - **Modify**: it also fills the MorphMan fields and adds tags.
-
-Ex: Sentence Bank, cards that can be used to find exemple for words you want to study.
-
+  Example: a sentence bank, with cards you can use as examples for the words you want to study.
 - **Reorder**: same as Modify, and it also sorts your new cards.
+  Example: your study deck.
 
-Ex: Your study deck.
+With Modify or Reorder, the **Modify Cards** section appears.
 
+Use **Populate Fields** to link the MorphMan fields you want to the fields of your note type. At least Focus Morph or Focus Reading is recommended.
 
-With Modify or Reorder, the **Modify Cards** section appears. 
-
-Use  **Populate Fields** to link the fields you're interested in to those on your note type. Focus Morph or Focus Reading is at least recommended.
-
-You can also edit the name of tags in the **Add Tags** sections. Leave the fields empty if you don't want them.
+You can also rename the tags in the **Add Tags** section. Leave a tag empty if you don't want it.
 
 ![Modify Cards tab](img/quickstart_modify_cards.png)
 
@@ -51,30 +45,30 @@ You can also edit the name of tags in the **Add Tags** sections. Leave the field
 
 Click **Recalc**, or press **Ctrl+M**.
 
-
 ## 5. Find media at your level
 
 Open the **Readability** tab.
 
-Check the media you're interested in. It can take a minute, maybe pick only one the first time. 
+Check the media you're interested in. It can take a minute, so maybe pick only one the first time.
 
 ![Compare Media](img/quickstart_compare.png)
 
-You will get a lot of data, but mainly:
+You get a lot of data, but mainly:
 
-- **Known Instances**: how much of the text already know.
+- **Known Instances %**: how much of the text you already know.
 - **To Learn**: how many words you need to reach your goal.
-- **Difficulty Score**: how hard is each title.
-- **Anki Deck**: Direct Link so you can download premade deck with all the sentences.
-- **Done**: So you can filter titles you alread studied or at not interested in
+- **Difficulty Score**: how hard each title is.
+- **Anki Deck**: a direct link to download a premade deck with all the sentences.
+- **Done**: to filter out the titles you've already studied or aren't interested in.
 
 ![Readability results](img/quickstart_results.png)
 
 ## 6. Study Plan
 
-You can filter the words you want to learn by two factors.
-- **Rank Limit**: to focus on the most frequent words.
-- **Target Readability**: to set a goal of how much you want to understand.
+You can filter the words you want to learn by two factors:
+
+- **Rank limit**: to focus on the most frequent words.
+- **Target readability**: to set how much you want to understand.
 
 ![Study Plan](img/quickstart_study.png)
 
@@ -97,6 +91,8 @@ Then, 3 choices:
 - **Add to deck**: makes the cards. A sentence from your own cards when there is one, with its sound and picture. Otherwise, a vocab card. See [Adding words to a deck](usage/add-to-deck.md).
 - **Update learning_order.txt…**: at the next Recalc, your cards that teach these words come first.
 - **Export .txt…**: saves the words as a file, to import in Anki with **File > Import**.
+
+![Words to learn](img/quickstart_words.png)
 
 ## What's next
 
