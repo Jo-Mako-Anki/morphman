@@ -30,9 +30,12 @@ The rest of the guide goes into detail, step by step.
 ## About AI
 
 I think it's becoming more and more important to say how AI was used to make a tool.
+
 The core functions already existed, as I mention above.
 AI helped me code the new functions, a lot of them for the UI. It also helped me write this guide, because English is not my first language.
+
 AI is not used at all for the Japanese in this add-on. MeCab, with the UniDic dictionary, cuts sentences into words. The meanings come from Jitendex, or your own Yomitan dictionaries.
+
 I use MorphMan every day for my own studies, so everything is constantly being tested.
 
 ## Questions
