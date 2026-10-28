@@ -6,8 +6,6 @@ You want to read a show, a game, a book. Which words should you learn first?
 
 The ones you'll meet the most. MorphMan writes them, in order, in `learning_order.txt`. At the next Recalc, the cards that teach these words come first.
 
-A section of the **Readability** tab. Turn it on with its switch.
-
 ## Master Frequency List
 
 A list of words, the most frequent first. MorphMan comes with one: `Master_All.txt`. See [Readability Files](../readability-files.md).
