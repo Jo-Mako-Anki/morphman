@@ -10,8 +10,8 @@ The ones you'll meet the most. MorphMan writes them, in order, in `learning_orde
 
 A list of words, the most frequent first. MorphMan comes with one: `Master_All.txt`. See [Readability Files](../readability-files.md).
 
-- **Select**: use another list. It must look like an `instance_freq_report.txt` file.
-- **Open**: look at the ranks and counts.
+- **Select**: use another list.
+- **Open**: open the text file.
 
 ## Rank limit
 
