@@ -1,7 +1,9 @@
 # Introduction
 
 I've been using MorphMan for years, but it was no longer maintained.
+
 I decided to update the add-on for compatibility, bundle it with my personal files, and add new features.
+
 Credit goes to those who made MorphMan what it was before this version (https://github.com/kaegi/MorphMan and later https://github.com/ianki).
 
 This guide explains how to use the new version, for long-time users and newcomers alike.
