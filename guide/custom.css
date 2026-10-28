@@ -27,3 +27,40 @@
     max-height: 100%;
     object-fit: contain;
 }
+
+/* The blue of MorphMan's sections. */
+:root {
+    --morphman-blue: #3b82f6;
+    --morphman-blue-tint: rgba(59, 130, 246, 0.08);
+    --morphman-blue-line: rgba(59, 130, 246, 0.25);
+}
+
+/* Section titles: a blue bar on the left, as in MorphMan. */
+.content main h2 {
+    border-left: 5px solid var(--morphman-blue);
+    padding-left: 10px;
+}
+
+/* Tables: a blue header, light blue rows. */
+.content main table {
+    border-collapse: collapse;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.content main table thead,
+.content main table thead tr {
+    background: var(--morphman-blue);
+}
+.content main table thead th {
+    color: #ffffff;
+    border-color: var(--morphman-blue);
+}
+.content main table td {
+    border-color: var(--morphman-blue-line);
+}
+.content main table tbody tr {
+    background: transparent;
+}
+.content main table tbody tr:nth-child(2n) {
+    background: var(--morphman-blue-tint);
+}
