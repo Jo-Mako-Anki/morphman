@@ -6,6 +6,22 @@ MorphMan (JoMako) is made by Jo Mako, on top of the original [MorphMan](https://
 
 It's free software, under the GPL v3 license, like the original.
 
+## Data files
+
+The GPL covers the code of MorphMan. It doesn't cover the data.
+
+Everything I made myself is not under the GPL: the Anki decks, the frequency lists, the corpora (.corpusdb), the game scripts and transcriptions, and the other files in Readability Files.
+
+These files are © Jo Mako. All rights reserved.
+
+You can use them for your own study. You can't, in whole or in part, without my written permission:
+- share or re-upload them;
+- sell them;
+- put them on a website, an app, another tool or a dataset;
+- use them to train AI.
+
+If you want to use them in a project, ask me first on Discord.
+
 ## Dictionaries and tools
 
 - **[MeCab](https://taku910.github.io/mecab/)**, by Taku Kudo: cuts Japanese into words.
