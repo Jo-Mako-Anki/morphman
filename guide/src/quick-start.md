@@ -93,9 +93,3 @@ Then, 3 choices:
 - **Export .txt…**: saves the words as a file, to import in Anki with **File > Import**.
 
 ![Words to learn](img/quickstart_words.png)
-
-## What's next
-
-- New to MorphMan? Read the [Glossary](glossary.md) first.
-- Want to change the thresholds or the fields? See [Setup](setup.md).
-- Something doesn't work? See [FAQ and Troubleshooting](faq.md), or ask on [Discord](https://discord.gg/J9Sw8jdkPY).
