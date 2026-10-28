@@ -22,6 +22,8 @@ Open the **Analyze Cards** tab.
 
 In **Identify Cards**, add a line for your Japanese note type and pick the field with the Japanese sentence.
 
+![Identify Cards tab](img/quickstart_identify_cards.png)
+
 Choose what MorphMan does with these cards:
 
 - **Count Words**: it only learns which words you know.
@@ -37,9 +39,13 @@ Ex: Sentence Bank, cards that can be used to find exemple for words you want to 
 Ex: Your study deck.
 
 
-With Modify or Reorder, the **Modify Cards** section appears. Pick the fields to fill in **Populate Fields**, and the tags in **Add Tags**.
+With Modify or Reorder, the **Modify Cards** section appears. 
 
-![Analyze Cards tab](img/quickstart_analyze_cards.png)
+Use  **Populate Fields** to link the fields you're interested in to those on your note type. Focus Morph or Focus Reading is at least recommended.
+
+You can also edit the name of tags in the **Add Tags** sections. Leave the fields empty if you don't want them.
+
+![Analyze Cards tab](img/quickstart_modify_cards.png)
 
 ## 4. Run Recalc
 
