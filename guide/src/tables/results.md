@@ -26,8 +26,6 @@ Shown by default:
 
 **Columns** lets you choose which ones to show. Drag a header to move a column.
 
-To Learn and Reachable % stay empty unless the **Study Plan** is on. See [learning_order.txt and the Master list](../readability/study-plan.md).
-
 ## Done and Exclude
 
 Right-click a row of **Results** (Readability tab). You can select several rows first.
