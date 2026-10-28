@@ -14,8 +14,6 @@ Click yes. A small window shows a few slides while it downloads. You can keep us
 
 When it's done, restart Anki.
 
-![Download window](img/quickstart_download.png)
-
 If you said no, MorphMan asks again at the next start. You can also go to **Settings > Parsing** and click **Download and install**.
 
 ## 3. Tell MorphMan which cards to read
@@ -27,8 +25,11 @@ In **Identify Cards**, add a line for your Japanese note type and pick the field
 Choose what MorphMan does with these cards:
 
 - **Count Words**: it only learns which words you know.
+For example, if you have a premade deck, like mine, to learn the most frequent vocabulary.
 - **Modify**: it also fills the MorphMan fields and adds tags.
+For example, if you use sentence bank, premade cards from media with sentence.
 - **Reorder**: same as Modify, and it also sorts your new cards.
+FOr example, the deck you use to study.
 
 Use **Count Words** for decks you don't want touched. Use **Reorder** for the deck you're learning from.
 
