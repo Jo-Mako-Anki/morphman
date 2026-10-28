@@ -64,3 +64,8 @@
 .content main table tbody tr:nth-child(2n) {
     background: var(--morphman-blue-tint);
 }
+
+/* Dark themes: lighter links in tables, so they show on the blue rows. */
+.navy .content main table a,
+.coal .content main table a,
+.ayu .content main table a { color: #93c5fd; }
