@@ -1,0 +1,9 @@
+[book]
+title = "MorphMan (JoMako) User Guide"
+authors = ["Jo Mako"]
+language = "en"
+src = "src"
+
+[output.html]
+git-repository-url = "https://github.com/Jo-Mako-Anki/morphman"
+edit-url-template = "https://github.com/Jo-Mako-Anki/morphman/edit/main/guide/{path}"
