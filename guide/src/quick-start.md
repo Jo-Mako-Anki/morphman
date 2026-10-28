@@ -25,11 +25,15 @@ In **Identify Cards**, add a line for your Japanese note type and pick the field
 Choose what MorphMan does with these cards:
 
 - **Count Words**: it only learns which words you know.
-- 
+
 Ex: A premade deck teaching you the most common vocabulary.
+
 - **Modify**: it also fills the MorphMan fields and adds tags.
+
 Ex: Sentence Bank, cards that can be used to find exemple for words you want to study.
+
 - **Reorder**: same as Modify, and it also sorts your new cards.
+
 Ex: Your study deck.
 
 
