@@ -1,0 +1,29 @@
+/* A wider text column, so that screenshots are readable. */
+:root {
+    --content-max-width: 1100px;
+}
+
+/* Screenshots: click to see them full size (custom.js). */
+.content main img {
+    cursor: zoom-in;
+    border: 1px solid var(--quote-border);
+    border-radius: 4px;
+}
+
+.image-zoom {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.85);
+    cursor: zoom-out;
+}
+
+.image-zoom img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
