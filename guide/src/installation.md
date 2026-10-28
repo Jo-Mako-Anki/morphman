@@ -19,8 +19,6 @@ When you start Anki, MorphMan asks to download and install it for you. Click **Y
 
 A window shows the progress, with MorphMan in a few slides. You can keep using Anki. Closing the window doesn't stop the download.
 
-![Download window](img/install_download.png)
-
 When it's done, restart Anki.
 
 ### If you said no
