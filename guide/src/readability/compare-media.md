@@ -6,7 +6,7 @@ Tick one or more categories: Anime, Game, Manga, Movie, TV, VN.
 
 These are premade corpora. They come with MorphMan, already analyzed, so there is nothing to download. See [Readability Files](../readability-files.md).
 
-Their folders are set in **Settings > Corpus Paths**. See [Settings](../setup.md).
+Their folders are set in **Settings > Files > Corpus folders**. See [Settings](../setup.md).
 
 ## Your own files
 
