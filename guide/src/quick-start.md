@@ -45,35 +45,58 @@ Use  **Populate Fields** to link the fields you're interested in to those on you
 
 You can also edit the name of tags in the **Add Tags** sections. Leave the fields empty if you don't want them.
 
-![Analyze Cards tab](img/quickstart_modify_cards.png)
+![Modify Cards tab](img/quickstart_modify_cards.png)
 
 ## 4. Run Recalc
 
 Click **Recalc**, or press **Ctrl+M**.
 
-The first one takes a while. After that, it's fast.
-
-Your new cards are now sorted: the k+1 cards (one unknown word) come first.
 
 ## 5. Find media at your level
 
 Open the **Readability** tab.
 
-Check a media (subtitles, a game script, a book…), then click **Analyze**.
+Check the media you're interested in. It can take a minute, maybe pick only one the first time. 
 
-You get:
+![Compare Media](img/quickstart_compare.png)
 
-- **Results**: how much of it you already know.
-- **Coverage**: how many words you need to reach your goal.
-- **Words to learn**: those words, the most useful first.
+You will get a lot of data, but mainly:
 
-![Readability results](img/quickstart_readability.png)
+- **Known Instances**: how much of the text already know.
+- **To Learn**: how many words you need to reach your goal.
+- **Difficulty Score**: how hard is each title.
+- **Anki Deck**: Direct Link so you can download premade deck with all the sentences.
+- **Done**: So you can filter titles you alread studied or at not interested in
 
-## 6. Learn the missing words
+![Readability results](img/quickstart_results.png)
 
-In **Words to learn**, select words and click **Add to deck**.
+## 6. Study Plan
 
-MorphMan makes new cards with real sentences from the media.
+You can filter the words you want to learn by two factors.
+- **Rank Limit**: to focus on the most frequent words.
+- **Target Readability**: to set a goal of how much you want to understand.
+
+![Study Plan](img/quickstart_study.png)
+
+## 7. Words to Learn
+
+Select a title in Results, then click **Words to learn…** (or double-click the row).
+
+You get its unknown words, the most frequent first.
+
+Select the words you want. The **Select** bar helps:
+
+- **First rows**: the first N words.
+- **Up to % known**: enough words to reach a %, for example 90 %.
+- **By Count**: the words that appear at least N times.
+
+No selection? The buttons use every word shown.
+
+Then, 3 choices:
+
+- **Add to deck**: makes the cards. A sentence from your own cards when there is one, with its sound and picture. Otherwise, a vocab card. See [Adding words to a deck](usage/add-to-deck.md).
+- **Update learning_order.txt…**: at the next Recalc, your cards that teach these words come first.
+- **Export .txt…**: saves the words as a file, to import in Anki with **File > Import**.
 
 ## What's next
 
