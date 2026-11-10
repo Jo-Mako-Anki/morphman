@@ -3,6 +3,7 @@
 <script>
   import DataTable from '../lib/DataTable.svelte';
   import { py, onPy } from '../lib/bridge.js';
+  import { num, loadUi } from '../lib/format.js';
 
   // Colonnes : [clé, titre, alignement gauche, largeur, filtre, bulle]
   const ALL = [
@@ -27,34 +28,85 @@
   let data = $state(null);
   let error = $state('');
   let q = $state('');
-  let show = $state('all'); // all | known | learn
+  let exact = $state(false); // Contains / Equals
+  let show = $state('learn'); // learn | known | all
   let media = $state('');
+  let group = $state('kanji');
+  let subs = $state('particles');
   let on = $state([...SHOWN]);
   let colsOpen = $state(false);
+  let marks = $state([]); // statuts changés à la main (appliqués au prochain Recalc)
+
+  const GROUPS = [
+    ['script', 'By script', 'One line per script: kanji, hiragana, katakana.', '素敵 · すてき · ステキ → 3 lines'],
+    ['kana', 'By kana', 'One line for the kanji, one line for all the kana (hiragana + katakana).', '素敵 · すてき+ステキ → 2 lines'],
+    ['kanji', 'By kanji, if more frequent', 'The kanji line takes the kana only when the kanji spelling is the most frequent; otherwise the lines stay separate. If you know 素敵, すてき and ステキ count as known.', 'kanji most frequent → 1 line · kana most frequent → 2 or 3 lines'],
+    ['kanjiall', 'By kanji, always', 'The kanji line always takes the kana, whatever their frequency.', '素敵+すてき+ステキ → 1 line (2 lines if the word has no kanji form)'],
+    ['word', 'By word', 'One line per word: the most frequent spelling, with all the others counted in it.', 'すてき (the most frequent) → 1 line'],
+  ];
+  const SUBS = [['particles', 'Particles only'], ['all', 'All words'], ['none', 'None']];
+  const groupLabel = $derived((GROUPS.find((g) => g[0] === group) || GROUPS[2])[1] + ' · ' + (SUBS.find((x) => x[0] === subs) || SUBS[0])[1].toLowerCase());
+
+  // Fenêtre Grouping
+  let gOpen = $state(false), gGroup = $state('kanji'), gSubs = $state('particles'), gNote = $state('');
+  const gStart = () => { gGroup = group; gSubs = subs; gNote = ''; gOpen = true; };
+  const gApply = () => { gOpen = false; group = gGroup; subs = gSubs; load(); };
+  const gSettings = async () => {
+    const r = await py('ms_save', { options: { Option_MatchWritten: gGroup, Option_MatchSubPos: gSubs } });
+    gNote = r && r.error ? r.error : 'Copied to Settings. Run Recalc to apply.';
+  };
 
   const label = (k) => (data && data.labels && data.labels[k]) || k;
+  const markOf = (r) => { const m = marks.find((x) => x.key === r.key && x.base === r.base && x.sub === r.subraw); return m ? m.state : null; };
+  const isKnown = (r) => { const m = markOf(r); return m ? m === 'known' : r.status === 'known'; };
+  async function toggleStatus(r) {
+    const want = isKnown(r) ? 'unknown' : 'known', base = r.status === 'known' ? 'known' : 'unknown';
+    marks = (await py('word_mark', { key: r.key, base: r.base, sub: r.subraw, state: want === base ? null : want })) || marks;
+    window.dispatchEvent(new Event('focus'));
+  }
+
   const getters = {
     pos: (r) => (r.cat === 'noise' ? r.pos_label : label(r.cat) || r.pos_label),
-    status: (r) => (r.nc ? 'Ignored' : r.status === 'known' ? 'Known' : 'Not known'),
+    status: (r) => (r.nc ? 'Ignored' : isKnown(r) ? 'Known' : 'Not known'),
+  };
+  const shows = {
+    rank: (r) => (r.covered ? '→ ' + r.covered : num(r.rank, 0)),
+    rank_kanji: (r) => (r.rank_kanji ? num(r.rank_kanji, 0) : '–'),
+    rank_kana: (r) => (r.rank_kana ? num(r.rank_kana, 0) : '–'),
+    count: (r) => num(r.count, 0),
+    pct: (r) => num(r.pct, 2),
+    cum: (r) => num(r.cum, 1),
+    spread: (r) => num(r.spread, 1) + ' %',
+    forms: (r) => (r.forms || []).join('・'),
+    status: (r) => getters.status(r) + (markOf(r) ? ' ●' : ''),
   };
   const columns = $derived(
     ALL.filter((c) => on.includes(c[0])).map(([key, lbl, left, width, filter, tip]) => ({
-      key, label: lbl, left: !!left, width, filter, tip, get: getters[key],
+      key, label: lbl, left: !!left, width, filter, tip, get: getters[key], show: shows[key],
+      onclick: key === 'status' ? (r) => !r.nc && toggleStatus(r) : null,
     })),
   );
   const rows = $derived(
-    data && data.rows ? data.rows.filter((r) => show === 'all' || (show === 'known') === (r.status === 'known')) : [],
+    data && data.rows ? data.rows.filter((r) => show === 'all' || (show === 'known') === isKnown(r)) : [],
   );
 
   function load() {
     data = null;
     error = '';
-    py('words', { mode: 'both', q: q.trim(), media, limit: 1000, meaning: on.includes('meaning') });
+    py('words', { mode: 'both', subs, cat: '', q: q.trim(), qcol: '', exact, group, media, limit: 1000, meaning: on.includes('meaning') });
   }
+  let tm;
+  const typed = () => { clearTimeout(tm); tm = setTimeout(load, 400); };
   $effect(() => onPy(({ kind, data: d }) => {
     if (kind === 'words') d && d.error ? (error = d.error) : (data = d);
   }));
-  load();
+  // Comme l'ancienne page : format des nombres, statuts marqués, réglages Grouping de Settings, puis la liste.
+  Promise.all([loadUi(), py('word_marks').then((m) => (marks = m || [])), py('ms_info').then((m) => {
+    const o = m && m.options;
+    if (!o) return;
+    subs = o.Option_MatchSubPos === true ? 'all' : o.Option_MatchSubPos === false ? 'none' : o.Option_MatchSubPos || 'particles';
+    group = GROUPS.some((g) => g[0] === o.Option_MatchWritten) ? o.Option_MatchWritten : 'kanji';
+  })]).finally(load);
 
   function toggleCol(k) {
     on = on.includes(k) ? on.filter((x) => x !== k) : ALL.map((c) => c[0]).filter((x) => x === k || on.includes(x));
@@ -65,20 +117,22 @@
 </script>
 
 <div class="bar">
-  <input class="search" placeholder="Search a word…" bind:value={q} onkeydown={(e) => e.key === 'Enter' && load()} />
+  <select class="msel" bind:value={media} onchange={load} title="The master frequency list of the whole catalog, or of one type of media (its own ranks and counts).">
+    <option value="">Master list: whole catalog</option>
+    {#each (data && data.all_media) || [] as m}<option value={m}>Master list: {m}</option>{/each}
+  </select>
+  <button class="btn sm" onclick={gStart} title="How the list groups the written forms and the sub-types">⚙ Grouping: {groupLabel}</button>
   <span class="seg">
-    {#each [['learn', 'To learn'], ['known', 'Known'], ['all', 'All']] as [v, t]}
+    {#each [['learn', 'Not known'], ['known', 'Known'], ['all', 'All']] as [v, t]}
       <button class="btn sm" class:on={show === v} onclick={() => (show = v)}>{t}</button>
     {/each}
   </span>
-  {#if data && data.all_media && data.all_media.length}
-    <select class="msel" bind:value={media} onchange={load}>
-      <option value="">All media</option>
-      {#each data.all_media as m}<option value={m}>{m}</option>{/each}
-    </select>
-  {/if}
+  <input class="search" placeholder="Search a word…" bind:value={q} oninput={typed} onkeydown={(e) => e.key === 'Enter' && load()} />
+  <select class="msel" title="Search mode" bind:value={exact} onchange={() => q.trim() && load()}>
+    <option value={false}>Contains</option><option value={true}>Equals</option>
+  </select>
   <span class="grow"></span>
-  <button class="btn sm" onclick={() => (colsOpen = !colsOpen)}>Columns ▾</button>
+  <button class="btn sm" onclick={() => (colsOpen = !colsOpen)}>▦ Columns</button>
   {#if colsOpen}
     <div class="cols card">
       {#each ALL as [k, t]}
@@ -87,6 +141,28 @@
     </div>
   {/if}
 </div>
+
+{#if gOpen}
+  <div class="gback" onclick={() => (gOpen = false)} role="presentation"></div>
+  <div class="gwin">
+    <h3>Grouping of the list</h3>
+    <div class="gs"><b>Written forms</b><div class="m small">How the spellings of a word are listed. Example: 素敵 / すてき / ステキ.</div>
+      {#each GROUPS as [v, t, d, ex]}
+        <label class="opt"><input type="radio" bind:group={gGroup} value={v} /><span><b>{t}</b><br /><span class="m small">{d}<br />{ex}</span></span></label>
+      {/each}
+    </div>
+    <div class="gs"><b>Separate by sub-type</b><div class="m small">Lists the same word several times by its Sub-POS (の: case particle / nominalizing / sentence-ending).</div>
+      {#each SUBS as [v, t]}<label class="opt"><input type="radio" bind:group={gSubs} value={v} /><span>{t}</span></label>{/each}
+    </div>
+    <div class="m small">These two choices only change how this list is shown. They do not change the database or your cards: Recalc uses the choices in Settings.</div>
+    {#if gNote}<div class="m small">{gNote}</div>{/if}
+    <div class="gft">
+      <button class="btn" onclick={gSettings} title="Copies these two choices to Settings (Recalc will use them).">Use in Settings too</button>
+      <span class="grow"></span>
+      <button class="btn" onclick={() => (gOpen = false)}>Cancel</button><button class="btn pri" onclick={gApply}>Apply</button>
+    </div>
+  </div>
+{/if}
 
 {#if error}
   <div class="m pad">{error}</div>
@@ -106,4 +182,10 @@
   .grow { flex: 1; }
   .cols { position: absolute; right: 0; top: 34px; z-index: 10; background: var(--p); border: 1px solid var(--l); border-radius: 10px; padding: 8px 12px; display: grid; gap: 4px; }
   .pad { padding: 6px 0; }
+  .gback { position: fixed; inset: 0; z-index: 30; background: #0008; }
+  .gwin { position: fixed; z-index: 31; left: 50%; top: 60px; transform: translateX(-50%); width: min(560px, 92vw); max-height: 80vh; overflow: auto; background: var(--p); border: 1px solid var(--l); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }
+  .gwin h3 { margin: 0; }
+  .gs { display: grid; gap: 6px; }
+  .opt { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+  .gft { display: flex; gap: 6px; align-items: center; }
 </style>

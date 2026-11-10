@@ -4,7 +4,8 @@
                   { key:'pos',  label:'POS',  filter:'choice' },
                   { key:'word', label:'Word', filter:'text', left:true }]
      Clic sur l'en-tête : tri. Clic droit ou ▾ : filtre.
-     Options de colonne : tip (bulle), width (px), get(row) (valeur affichée/filtrée).
+     Options de colonne : tip (bulle), width (px), get(row) (valeur filtrée et triée),
+     show(row) (texte affiché, sinon la valeur), onclick(row) (cellule cliquable).
      Snippet optionnel `cell(row, col)` pour un rendu personnalisé. -->
 <script>
   import Pager from './Pager.svelte';
@@ -39,6 +40,7 @@
     filters = f;
     page = 1;
   }
+  const text = (col, row) => (col.show ? col.show(row) : valueOf(col, row) ?? '');
   const isOn = (k) => filters[k] != null && filters[k] !== '';
 </script>
 
@@ -58,7 +60,7 @@
       {#each shown as row, i}
         <tr onclick={onrowclick ? () => onrowclick(row) : null}>
           {#each columns as col (col.key)}
-            <td class:left={col.left} ondblclick={oncelldblclick ? (e) => oncelldblclick(row, col, e) : null}>{#if cell}{@render cell(row, col)}{:else}{valueOf(col, row) ?? ''}{/if}</td>
+            <td class:left={col.left} ondblclick={oncelldblclick ? (e) => oncelldblclick(row, col, e) : null}>{#if cell}{@render cell(row, col)}{:else if col.onclick}<button class="cb" onclick={(e) => { e.stopPropagation(); col.onclick(row); }}>{text(col, row)}</button>{:else}{text(col, row)}{/if}</td>
           {/each}
         </tr>
       {/each}
@@ -86,6 +88,8 @@
   .nfh.nff { color: var(--a); }
   .nf { background: none; border: 1px solid var(--l); color: var(--m); border-radius: 999px; padding: 0 8px; margin-left: 4px; font-size: 11px; cursor: pointer; }
   .nf.on { background: var(--a); color: #0c1020; border-color: var(--a); }
+  .cb { background: none; border: 0; color: inherit; font: inherit; cursor: pointer; padding: 0; }
+  .cb:hover { text-decoration: underline; }
   td { padding: 5px 6px; text-align: center; }
   tbody tr:nth-child(even) { background: var(--zebra); }
   tbody tr:hover { background: var(--hov); }
