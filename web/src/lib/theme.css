@@ -1,0 +1,9 @@
+/* Couleurs et boutons communs (repris de l'ancien app.css). */
+:root{--bg:#101319;--p:#1a1e28;--p2:#252b38;--l:#323a4c;--t:#e6e8ec;--m:#9aa6bd;--a:#6f93ff;--g:#3fd19a;--y:#f0b94d;--r:#f2726f;--zebra:rgba(111,147,255,.06);--hov:rgba(111,147,255,.16)}
+body{margin:0;background:var(--bg);color:var(--t);font-family:system-ui,sans-serif;font-size:14px}
+.m{color:var(--m)}
+.small{font-size:12px}
+.btn{background:var(--p2);color:var(--t);border:1px solid var(--l);border-radius:8px;padding:5px 10px;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.pri{background:var(--a);color:#0c1020;border-color:var(--a);font-weight:700}
+.btn.sm{padding:3px 8px;font-size:12px}
