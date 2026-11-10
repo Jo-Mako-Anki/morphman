@@ -45,13 +45,7 @@
   let filters = $state({});
   let page = $state(1);
   let basket = $state([]);
-  let colorsOpen = $state(false);
-  const POSC = [['verb', 'Verb', '#a5d6a7'], ['adji', 'い-Adjective', '#e48872'], ['adjna', 'な-Adjective', '#ffab91'], ['noun', 'Noun', '#93a5d9'], ['copula', 'だ / Copula', '#b388ff'], ['prt', 'Particle', '#ffe082'], ['adv', 'Adverb', '#ffb74d']];
-  let posColors = $state(Object.fromEntries(POSC.map((c) => [c[0], c[2]])));
-  const posKind = (r) => (r.cat === '助動詞' && (r.base === 'だ' || r.base === 'です') ? 'copula' : { '動詞': 'verb', '形容詞': 'adji', '形状詞': 'adjna', '名詞': 'noun', '助詞': 'prt', '副詞': 'adv' }[r.cat]);
-  const saveUi = () => py('save_ui', { ...ui, basket, vocab: { ...(ui.vocab || {}), posColors: { ...posColors } } });
-  const setColor = (k, v) => { posColors = { ...posColors, [k]: v }; saveUi(); };
-  const resetColors = () => { posColors = Object.fromEntries(POSC.map((c) => [c[0], c[2]])); saveUi(); };
+  const saveUi = () => py('save_ui', { ...ui, basket, vocab: { ...(ui.vocab || {}) } });
   const bid = (r) => r.rid ?? r.id;
   const inBasket = (r) => basket.some((o) => o.id === bid(r));
   function toggleBasket(r) {
@@ -133,7 +127,6 @@
         key, label: lbl, left: !!left, width, filter, tip, get: getters[key], show: shows[key],
         jp: ['word', 'base', 'reading', 'forms'].includes(key),
         big: ['word', 'base', 'reading'].includes(key),
-        style: key === 'pos' ? (r) => { const c = posColors[posKind(r)]; return c ? 'color:' + c : ''; } : null,
         parts: key === 'meaning' ? glossParts : null,
         btn: key === 'basket' ? (r) => ({ label: inBasket(r) ? '✓ In' : '＋', on: inBasket(r) }) : key === 'origin' ? (r) => (isKnown(r) && !r.nc ? { label: 'Origin' } : null) : null,
         cls: key === 'status' ? (r) => (isKnown(r) ? 'known' : 'new') : null,
@@ -157,7 +150,7 @@
     if (kind === 'words') d && d.error ? (error = d.error) : (data = d);
   }));
   // Comme l'ancienne page : format des nombres, statuts marqués, réglages Grouping de Settings, puis la liste.
-  Promise.all([loadUi().then((u) => { basket = (u && u.basket) || []; const pc = u && u.vocab && u.vocab.posColors; if (pc) posColors = { ...posColors, ...pc }; }), py('word_marks').then((m) => (marks = m || [])), py('ms_info').then((m) => {
+  Promise.all([loadUi().then((u) => { basket = (u && u.basket) || []; }), py('word_marks').then((m) => (marks = m || [])), py('ms_info').then((m) => {
     const o = m && m.options;
     if (!o) return;
     subs = o.Option_MatchSubPos === true ? 'all' : o.Option_MatchSubPos === false ? 'none' : o.Option_MatchSubPos || 'particles';
@@ -186,16 +179,6 @@
     const r = await py('words_file', { media, group });
     if (r && r.error) fileMsg = r.error;
   }
-  const summary = $derived.by(() => {
-    if (!data || data.error) return '';
-    let t = `${num(data.known, 0)} known · ${num(data.young, 0)} learning`;
-    const need = data.learn_need, tg = Math.round((ui.titles && ui.titles.target) || 85);
-    if (need && data.learn_now != null) {
-      const n = need[tg];
-      t += ` · Now ${num(data.learn_now, 1)} % · ${tg} %: ${n == null ? 'not reachable' : n === 0 ? 'reached' : num(n, 0) + ' words to learn'}`;
-    }
-    return t;
-  });
   const browse = (r, c, e) =>
     py('wtl_browser', { word: c.key === 'base' ? r.base : r.word, pos: r.pos, sub: r.subraw === '*' ? '' : r.subraw, wide: e.shiftKey });
 </script>
@@ -216,24 +199,15 @@
     <Segmented bind:value={exact} options={[[false, 'Contains'], [true, 'Equals']]} title="Search mode" onchange={() => q.trim() && load()} />
   </div>
   <span class="grow"></span>
-  <span class="m small summary">{summary}</span>
   <button class="btn sm" onclick={() => (colsOpen = !colsOpen)}>▦ Columns</button>
-  <button class="btn sm" onclick={() => (colorsOpen = !colorsOpen)} title="Colors of the POS column">🎨 POS colors</button>
   <button class="btn sm" onclick={exportList} title="Saves the list as shown (filters, sort, columns and the settings above), all pages, to a tab-separated file (Excel, Google Sheets)">⬇ Export…</button>
   <button class="btn sm" onclick={openFile} title="Opens the master list file of this selection (All the catalog, or the chosen media)">📂 Open file</button>
   {#if colsOpen}
+    <div class="cgone" onclick={() => (colsOpen = false)} role="presentation"></div>
     <div class="cols card">
       {#each order as k}
         <label><input type="checkbox" checked={!off.includes(k)} onchange={() => toggleCol(k)} /> {byKey[k][1]}</label>
       {/each}
-    </div>
-  {/if}
-  {#if colorsOpen}
-    <div class="cols card">
-      {#each POSC as [k, t]}
-        <label><input type="color" value={posColors[k]} onchange={(e) => setColor(k, e.currentTarget.value)} /> <span style="color:{posColors[k]}">{t}</span></label>
-      {/each}
-      <button class="btn sm" onclick={resetColors}>Reset</button>
     </div>
   {/if}
 </div>
@@ -283,9 +257,9 @@
   .chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
   .chip { background: var(--p2); color: var(--t); border: 1px solid var(--a); border-radius: 12px; padding: 2px 10px; font-size: 12px; cursor: pointer; }
   .search { background: var(--bg); color: var(--t); border: 1px solid var(--l); border-radius: 8px; padding: 5px 8px; width: 220px; }
-  .summary { white-space: nowrap; }
   .msel { background: var(--bg); color: var(--t); border: 1px solid var(--l); border-radius: 8px; padding: 5px 8px; }
   .grow { flex: 1; }
+  .cgone { position: fixed; inset: 0; z-index: 9; }
   .cols { position: absolute; right: 0; top: 46px; z-index: 10; background: var(--p); border: 1px solid var(--l); border-radius: 10px; padding: 8px 12px; display: grid; gap: 4px; }
   .pad { padding: 6px 0; }
   .gback { position: fixed; inset: 0; z-index: 30; background: #0008; }

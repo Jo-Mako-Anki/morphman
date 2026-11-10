@@ -130,8 +130,8 @@
   th.left, td.left { text-align: left; }
   td { padding: 6px; border-bottom: 1px solid var(--p2); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   th + th, td + td { border-left: 1px solid var(--p2); }
-  td.jp { font-size: 15px; }
-  td.big { font-size: 18px; }
+  td.jp { font-size: 14px; }
+  td.big { font-size: 16px; }
   .gl + .gl::before { content: '·'; color: var(--m); margin: 0 7px; }
   .cb { background: var(--p2); color: var(--t); border: 1px solid var(--l); border-radius: 6px; padding: 1px 8px; font-size: 12px; cursor: pointer; }
   .cb.on { background: var(--a); color: #fff; border-color: var(--a); }
