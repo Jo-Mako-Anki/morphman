@@ -146,13 +146,13 @@
     data && data.rows ? data.rows.filter((r) => show === 'all' || (show === 'known') === (r.status === 'known')) : [],
   );
 
-  function load() {
-    data = null;
+  function load(keep = false) {
+    if (!keep) data = null; // keep : la liste reste affichée pendant qu'on va chercher une colonne de plus
     error = '';
     py('words', { mode: 'both', subs, cat: '', q: q.trim(), qcol: '', exact, group, media, limit: 1000, meaning: on.includes('meaning'), cols: [...on] });
   }
   let tm;
-  const typed = () => { clearTimeout(tm); tm = setTimeout(load, 400); };
+  const typed = () => { clearTimeout(tm); tm = setTimeout(() => load(), 400); };
   $effect(() => onPy(({ kind, data: d }) => {
     if (kind === 'words') d && d.error ? (error = d.error) : (data = d);
   }));
@@ -162,12 +162,12 @@
     if (!o) return;
     subs = o.Option_MatchSubPos === true ? 'all' : o.Option_MatchSubPos === false ? 'none' : o.Option_MatchSubPos || 'particles';
     group = GROUPS.some((g) => g[0] === o.Option_MatchWritten) ? o.Option_MatchWritten : 'kanji';
-  })]).finally(load);
+  })]).finally(() => load());
 
   function toggleCol(k) {
     const hide = !off.includes(k);
     off = hide ? [...off, k] : off.filter((x) => x !== k);
-    if (!hide && data && data.cols && !data.cols.includes(k)) load(); // colonne pas encore envoyée par Python
+    if (!hide && data && data.cols && !data.cols.includes(k)) load(true); // colonne pas encore envoyée par Python
   }
   function reorder(from, to) {
     const rest = order.filter((k) => k !== from), i = rest.indexOf(to);
@@ -202,7 +202,7 @@
 
 <div class="bar">
   <div class="sec"><span class="lab">Source</span>
-    <select class="msel" bind:value={media} onchange={load} title="The master frequency list of the whole catalog, or of one type of media (its own ranks and counts).">
+    <select class="msel" bind:value={media} onchange={() => load()} title="The master frequency list of the whole catalog, or of one type of media (its own ranks and counts).">
       <option value="">All media</option>
       {#each (data && data.all_media) || [] as m}<option value={m}>{m}</option>{/each}
     </select>
