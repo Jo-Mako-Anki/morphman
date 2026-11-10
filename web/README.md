@@ -23,7 +23,7 @@ Exemple de colonnes :
 
 ## Ordre de réécriture des pages
 
-1. Vocabulary
+1. Vocabulary (v1 : recherche, To learn/Known/All, média, colonnes, double-clic → Browser. Reste : Status cliquable, Basket, Origin, Grouping, ordre des colonnes par glisser, réglages mémorisés)
 2. Titles : liste, overview, words, script
 3. Words to learn + panier (Add to deck)
 4. Browser (recherche au double-clic)

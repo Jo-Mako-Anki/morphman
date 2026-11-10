@@ -4,17 +4,18 @@
                   { key:'pos',  label:'POS',  filter:'choice' },
                   { key:'word', label:'Word', filter:'text', left:true }]
      Clic sur l'en-tête : tri. Clic droit ou ▾ : filtre.
+     Options de colonne : tip (bulle), width (px), get(row) (valeur affichée/filtrée).
      Snippet optionnel `cell(row, col)` pour un rendu personnalisé. -->
 <script>
   import Pager from './Pager.svelte';
   import FilterPopup from './FilterPopup.svelte';
-  import { applyFilters, sortRows, choiceValues } from './filters.js';
+  import { applyFilters, sortRows, choiceValues, valueOf } from './filters.js';
 
   let {
     rows = [], columns = [], noun = 'rows',
     filters = $bindable({}), sort = $bindable({ key: null, dir: 1 }),
     page = $bindable(1), per = $bindable(20),
-    cell = null, onrowclick = null,
+    cell = null, onrowclick = null, oncelldblclick = null,
   } = $props();
 
   const filtered = $derived(applyFilters(rows, columns, filters));
@@ -46,7 +47,7 @@
     <thead>
       <tr>
         {#each columns as col (col.key)}
-          <th class="nfh" class:left={col.left} class:nff={isOn(col.key)} onclick={() => sortBy(col)} oncontextmenu={(e) => openFilter(e, col)}>
+          <th class="nfh" class:left={col.left} title={col.tip || ''} style={col.width ? `width:${col.width}px;min-width:${col.width}px` : ''} class:nff={isOn(col.key)} onclick={() => sortBy(col)} oncontextmenu={(e) => openFilter(e, col)}>
             {col.label}{#if sort.key === col.key}{sort.dir > 0 ? ' ▲' : ' ▼'}{/if}
             {#if col.filter}<button class="nf" class:on={isOn(col.key)} onclick={(e) => openFilter(e, col)} aria-label="Filter {col.label}">▾</button>{/if}
           </th>
@@ -57,7 +58,7 @@
       {#each shown as row, i}
         <tr onclick={onrowclick ? () => onrowclick(row) : null}>
           {#each columns as col (col.key)}
-            <td class:left={col.left}>{#if cell}{@render cell(row, col)}{:else}{row[col.key] ?? ''}{/if}</td>
+            <td class:left={col.left} ondblclick={oncelldblclick ? (e) => oncelldblclick(row, col, e) : null}>{#if cell}{@render cell(row, col)}{:else}{valueOf(col, row) ?? ''}{/if}</td>
           {/each}
         </tr>
       {/each}
