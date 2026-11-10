@@ -61,7 +61,16 @@
     saveUi();
   }
   const origin = (r) => py('wtl_known_source', { key: r.key || '', base: r.base, sub: r.subraw || '*' });
-  const glossParts = (r) => String(r.meaning || '').split(/;\s*/).filter(Boolean);
+  // Les étiquettes du dictionnaire arrivent collées au premier sens (« aux-verbcopula; be; is ») : on les retire.
+  const TAG = /^(?:(?:na|no|taru|ku|shiku|nari|pre)-adj|aux-verb|aux-adj|aux|adjectival|adjective|adverbial|adverb|nouns?|pronoun|\d-dan|ichidan|godan|suru|kuru|verb|transitive|intransitive|auxiliary|interjection|conjunction|copula|prefix|suffix|kana|polite|particle|counter|expressions?)+/i;
+  const glossParts = (r) => {
+    const out = [];
+    String(r.meaning || '').split(/;\s*/).filter(Boolean).forEach((g, i) => {
+      if (i < 2) { const rest = g.replace(TAG, '').trim(); if (rest !== g) { if (rest) out.push(rest); return; } }
+      out.push(g);
+    });
+    return out;
+  };
   // Filtres actifs : une puce par filtre
   const chips = $derived(
     Object.entries(filters).filter(([, v]) => v != null && v !== '' && !(Array.isArray(v) && !v.length)).map(([k, v]) => {
