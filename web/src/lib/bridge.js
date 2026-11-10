@@ -1,5 +1,8 @@
 // Pont avec Python (Anki). Même contrat que l'ancien app.js :
 //  py("commande:json") -> réponse JSON ; onPy(fn) reçoit les messages poussés par Python.
+import { installMock } from './mock.js';
+if (location.protocol === 'file:') installMock(); // page exportée, ouverte hors d'Anki
+
 const ready = () => new Promise((ok) => {
   const wait = () => (window.pycmd ? ok() : setTimeout(wait, 30));
   wait();

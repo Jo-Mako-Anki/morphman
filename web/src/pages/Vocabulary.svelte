@@ -25,7 +25,7 @@
   ];
   const SHOWN = ['rank', 'word', 'base', 'reading', 'pos', 'count', 'pct', 'cum', 'spread', 'status'];
 
-  let data = $state(null);
+  let data = $state.raw(null); // .raw : 160 000 lignes sans proxy réactif (bien plus rapide)
   let error = $state('');
   let q = $state('');
   let exact = $state(false); // Contains / Equals
@@ -93,7 +93,7 @@
   function load() {
     data = null;
     error = '';
-    py('words', { mode: 'both', subs, cat: '', q: q.trim(), qcol: '', exact, group, media, limit: 1000, meaning: on.includes('meaning') });
+    py('words', { mode: 'both', subs, cat: '', q: q.trim(), qcol: '', exact, group, media, limit: 1000, meaning: on.includes('meaning'), cols: [...on] });
   }
   let tm;
   const typed = () => { clearTimeout(tm); tm = setTimeout(load, 400); };
@@ -110,7 +110,7 @@
 
   function toggleCol(k) {
     on = on.includes(k) ? on.filter((x) => x !== k) : ALL.map((c) => c[0]).filter((x) => x === k || on.includes(x));
-    if (k === 'meaning' && on.includes('meaning') && data && !data.meaning) load();
+    if (on.includes(k) && data && data.cols && !data.cols.includes(k)) load(); // colonne pas encore envoyée par Python
   }
   const browse = (r, c, e) =>
     py('wtl_browser', { word: c.key === 'base' ? r.base : r.word, pos: r.pos, sub: r.subraw === '*' ? '' : r.subraw, wide: e.shiftKey });
