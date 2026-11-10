@@ -9,11 +9,11 @@
   // Colonnes : [clé, titre, alignement gauche, largeur, filtre, bulle]
   const ALL = [
     ['rank', 'Rank', 0, 64, 'num', 'Learning rank: forms learned from the most frequent to the least, following Settings > Written forms. → = already covered by that form, no need to learn it. – = ignored.'],
-    ['word', 'Norm', 1, 120, 'text', 'Normalized written form.'],
-    ['base', 'Base', 1, 120, 'text', 'Dictionary form.'],
+    ['word', 'Norm', 0, 130, 'text', 'Normalized written form.'],
+    ['base', 'Base', 0, 130, 'text', 'Dictionary form.'],
     ['rank_kanji', 'Rank Kanji', 0, 84, 'num', 'Rank of the kanji form of the word in this list.'],
     ['rank_kana', 'Rank Kana', 0, 84, 'num', 'Rank of the kana form of the word in this list.'],
-    ['reading', 'Reading', 1, 130, 'text', 'Reading, in hiragana.'],
+    ['reading', 'Reading', 0, 140, 'text', 'Reading, in hiragana.'],
     ['pos', 'POS', 1, 130, 'choice', 'Type of the word: noun, verb, particle…, or Proper noun / Noise (fillers, numbers, symbols; list bruits.txt).'],
     ['sub', 'Sub-POS', 1, 130, 'choice', 'Finer part of speech from MeCab: common noun, suru verb…'],
     ['count', 'Count', 0, 80, 'num', 'Times the word appears in this selection.'],
@@ -23,8 +23,10 @@
     ['forms', 'Forms', 1, 160, 'text', 'The other written forms of the word found in the texts.'],
     ['meaning', 'Meaning', 1, 320, 'text', 'Short definition from your Yomitan dictionaries (Jitendex by default), as in Words to learn.'],
     ['status', 'Status', 0, 100, 'choice', 'Known if the word is in your known words (last Recalc), otherwise Not known.'],
+    ['basket', 'Basket', 0, 80, null, 'Add the word to the basket to make cards.'],
+    ['origin', 'Origin', 0, 80, null, 'Click to see which cards make this word Known (opens them in the Browser).'],
   ];
-  const SHOWN = ['rank', 'word', 'base', 'reading', 'pos', 'count', 'pct', 'cum', 'spread', 'status'];
+  const SHOWN = ['rank', 'word', 'base', 'reading', 'pos', 'count', 'pct', 'cum', 'spread', 'status', 'basket', 'origin'];
 
   let data = $state.raw(null); // .raw : 160 000 lignes sans proxy réactif (bien plus rapide)
   let error = $state('');
@@ -40,6 +42,35 @@
   let result = $state([]); // lignes filtrées et triées, toutes pages (Export)
   let fileMsg = $state('');
   let colsOpen = $state(false);
+  let filters = $state({});
+  let page = $state(1);
+  let basket = $state([]);
+  let colorsOpen = $state(false);
+  const POSC = [['verb', 'Verb', '#a5d6a7'], ['adji', 'い-Adjective', '#e48872'], ['adjna', 'な-Adjective', '#ffab91'], ['noun', 'Noun', '#93a5d9'], ['copula', 'だ / Copula', '#b388ff'], ['prt', 'Particle', '#ffe082'], ['adv', 'Adverb', '#ffb74d']];
+  let posColors = $state(Object.fromEntries(POSC.map((c) => [c[0], c[2]])));
+  const posKind = (r) => (r.cat === '助動詞' && (r.base === 'だ' || r.base === 'です') ? 'copula' : { '動詞': 'verb', '形容詞': 'adji', '形状詞': 'adjna', '名詞': 'noun', '助詞': 'prt', '副詞': 'adv' }[r.cat]);
+  const saveUi = () => py('save_ui', { ...ui, basket, vocab: { ...(ui.vocab || {}), posColors: { ...posColors } } });
+  const setColor = (k, v) => { posColors = { ...posColors, [k]: v }; saveUi(); };
+  const resetColors = () => { posColors = Object.fromEntries(POSC.map((c) => [c[0], c[2]])); saveUi(); };
+  const bid = (r) => r.rid ?? r.id;
+  const inBasket = (r) => basket.some((o) => o.id === bid(r));
+  function toggleBasket(r) {
+    const i = basket.findIndex((o) => o.id === bid(r));
+    basket = i >= 0 ? basket.filter((_, j) => j !== i)
+      : [...basket, { from: 'words', id: bid(r), word: r.word, pos: r.pos_label || r.pos, sublab: r.sub || '', title: media || '', rank: r.rank, bq: { word: r.base ?? r.word, pos: r.pos || '', sub: r.subraw && r.subraw !== '*' ? r.subraw : '' } }];
+    saveUi();
+  }
+  const origin = (r) => py('wtl_known_source', { key: r.key || '', base: r.base, sub: r.subraw || '*' });
+  const glossParts = (r) => String(r.meaning || '').split(/;\s*/).filter(Boolean);
+  // Filtres actifs : une puce par filtre
+  const chips = $derived(
+    Object.entries(filters).filter(([, v]) => v != null && v !== '' && !(Array.isArray(v) && !v.length)).map(([k, v]) => {
+      const c = byKey[k];
+      return { k, text: (c ? c[1] : k) + ' : ' + (Array.isArray(v) ? v.join(', ') : v) };
+    }),
+  );
+  const clearFilter = (k) => { const f = { ...filters }; delete f[k]; filters = f; page = 1; };
+  const clearAll = () => { filters = {}; page = 1; };
   let marks = $state([]); // statuts changés à la main (appliqués au prochain Recalc)
 
   const GROUPS = [
@@ -92,9 +123,13 @@
       return {
         key, label: lbl, left: !!left, width, filter, tip, get: getters[key], show: shows[key],
         jp: ['word', 'base', 'reading', 'forms'].includes(key),
+        big: ['word', 'base', 'reading'].includes(key),
+        style: key === 'pos' ? (r) => { const c = posColors[posKind(r)]; return c ? 'color:' + c : ''; } : null,
+        parts: key === 'meaning' ? glossParts : null,
+        btn: key === 'basket' ? (r) => ({ label: inBasket(r) ? '✓ In' : '＋', on: inBasket(r) }) : key === 'origin' ? (r) => (isKnown(r) && !r.nc ? { label: 'Origin' } : null) : null,
         cls: key === 'status' ? (r) => (isKnown(r) ? 'known' : 'new') : null,
         title: key === 'status' ? (r) => (markOf(r) ? 'Marked by you: applied at the next Recalc. Click to change.' : 'Click to mark it ' + (isKnown(r) ? 'Not known' : 'Known') + ' (applied at the next Recalc).') : null,
-        onclick: key === 'status' ? (r) => !r.nc && toggleStatus(r) : null,
+        onclick: key === 'status' ? (r) => !r.nc && toggleStatus(r) : key === 'basket' ? toggleBasket : key === 'origin' ? origin : null,
       };
     }),
   );
@@ -113,7 +148,7 @@
     if (kind === 'words') d && d.error ? (error = d.error) : (data = d);
   }));
   // Comme l'ancienne page : format des nombres, statuts marqués, réglages Grouping de Settings, puis la liste.
-  Promise.all([loadUi(), py('word_marks').then((m) => (marks = m || [])), py('ms_info').then((m) => {
+  Promise.all([loadUi().then((u) => { basket = (u && u.basket) || []; const pc = u && u.vocab && u.vocab.posColors; if (pc) posColors = { ...posColors, ...pc }; }), py('word_marks').then((m) => (marks = m || [])), py('ms_info').then((m) => {
     const o = m && m.options;
     if (!o) return;
     subs = o.Option_MatchSubPos === true ? 'all' : o.Option_MatchSubPos === false ? 'none' : o.Option_MatchSubPos || 'particles';
@@ -157,17 +192,24 @@
 </script>
 
 <div class="bar">
-  <select class="msel" bind:value={media} onchange={load} title="The master frequency list of the whole catalog, or of one type of media (its own ranks and counts).">
-    <option value="">All media</option>
-    {#each (data && data.all_media) || [] as m}<option value={m}>{m}</option>{/each}
-  </select>
-  <button class="btn sm" onclick={gStart} title="How the list groups the written forms and the sub-types">⚙ Grouping: {groupLabel}</button>
-  <Segmented bind:value={show} options={[['learn', 'Not known'], ['known', 'Known'], ['all', 'All']]} />
-  <input class="search" placeholder="Search a word…" bind:value={q} oninput={typed} onkeydown={(e) => e.key === 'Enter' && load()} />
-  <Segmented bind:value={exact} options={[[false, 'Contains'], [true, 'Equals']]} title="Search mode" onchange={() => q.trim() && load()} />
+  <div class="sec"><span class="lab">Source</span>
+    <select class="msel" bind:value={media} onchange={load} title="The master frequency list of the whole catalog, or of one type of media (its own ranks and counts).">
+      <option value="">All media</option>
+      {#each (data && data.all_media) || [] as m}<option value={m}>{m}</option>{/each}
+    </select>
+    <button class="btn sm" onclick={gStart} title="How the list groups the written forms and the sub-types">⚙ Grouping: {groupLabel}</button>
+  </div>
+  <div class="sec"><span class="lab">Status</span>
+    <Segmented bind:value={show} options={[['learn', 'Not known'], ['known', 'Known'], ['all', 'All']]} />
+  </div>
+  <div class="sec"><span class="lab">Search</span>
+    <input class="search" placeholder="Search a word…" bind:value={q} oninput={typed} onkeydown={(e) => e.key === 'Enter' && load()} />
+    <Segmented bind:value={exact} options={[[false, 'Contains'], [true, 'Equals']]} title="Search mode" onchange={() => q.trim() && load()} />
+  </div>
   <span class="grow"></span>
   <span class="m small summary">{summary}</span>
   <button class="btn sm" onclick={() => (colsOpen = !colsOpen)}>▦ Columns</button>
+  <button class="btn sm" onclick={() => (colorsOpen = !colorsOpen)} title="Colors of the POS column">🎨 POS colors</button>
   <button class="btn sm" onclick={exportList} title="Saves the list as shown (filters, sort, columns and the settings above), all pages, to a tab-separated file (Excel, Google Sheets)">⬇ Export…</button>
   <button class="btn sm" onclick={openFile} title="Opens the master list file of this selection (All the catalog, or the chosen media)">📂 Open file</button>
   {#if colsOpen}
@@ -177,7 +219,22 @@
       {/each}
     </div>
   {/if}
+  {#if colorsOpen}
+    <div class="cols card">
+      {#each POSC as [k, t]}
+        <label><input type="color" value={posColors[k]} onchange={(e) => setColor(k, e.currentTarget.value)} /> <span style="color:{posColors[k]}">{t}</span></label>
+      {/each}
+      <button class="btn sm" onclick={resetColors}>Reset</button>
+    </div>
+  {/if}
 </div>
+{#if chips.length}
+  <div class="chips">
+    <span class="m small">Filters:</span>
+    {#each chips as c}<button class="chip" onclick={() => clearFilter(c.k)} title="Remove this filter">{c.text} ✕</button>{/each}
+    <button class="btn sm" onclick={clearAll}>Clear all filters</button>
+  </div>
+{/if}
 {#if fileMsg}<div class="m small pad">{fileMsg}</div>{/if}
 
 {#if gOpen}
@@ -207,16 +264,20 @@
 {:else if !data}
   <div class="m pad">Loading words…</div>
 {:else}
-  <DataTable {rows} {columns} noun="words" bind:result oncelldblclick={browse} onreorder={reorder} />
+  <DataTable {rows} {columns} noun="words" bind:filters bind:page bind:result oncelldblclick={browse} onreorder={reorder} />
 {/if}
 
 <style>
-  .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative; margin-bottom: 8px; }
+  .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative; margin-bottom: 8px; background: var(--p); border: 1px solid var(--l); border-radius: 12px; padding: 6px 8px; }
+  .sec { display: flex; align-items: center; gap: 8px; background: var(--p2); border-radius: 10px; padding: 4px 8px; }
+  .lab { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--m); }
+  .chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .chip { background: var(--p2); color: var(--t); border: 1px solid var(--a); border-radius: 12px; padding: 2px 10px; font-size: 12px; cursor: pointer; }
   .search { background: var(--bg); color: var(--t); border: 1px solid var(--l); border-radius: 8px; padding: 5px 8px; width: 220px; }
   .summary { white-space: nowrap; }
   .msel { background: var(--bg); color: var(--t); border: 1px solid var(--l); border-radius: 8px; padding: 5px 8px; }
   .grow { flex: 1; }
-  .cols { position: absolute; right: 0; top: 34px; z-index: 10; background: var(--p); border: 1px solid var(--l); border-radius: 10px; padding: 8px 12px; display: grid; gap: 4px; }
+  .cols { position: absolute; right: 0; top: 46px; z-index: 10; background: var(--p); border: 1px solid var(--l); border-radius: 10px; padding: 8px 12px; display: grid; gap: 4px; }
   .pad { padding: 6px 0; }
   .gback { position: fixed; inset: 0; z-index: 30; background: #0008; }
   .gwin { position: fixed; z-index: 31; left: 50%; top: 60px; transform: translateX(-50%); width: min(560px, 92vw); max-height: 80vh; overflow: auto; background: var(--p); border: 1px solid var(--l); border-radius: 12px; padding: 16px; display: grid; gap: 12px; }

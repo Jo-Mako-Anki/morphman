@@ -5,7 +5,8 @@
                   { key:'word', label:'Word', filter:'text', left:true }]
      Clic sur l'en-tête : tri. Clic droit : filtre. Glisser l'en-tête : réorganiser (onreorder(de, vers)).
      Options de colonne : tip (bulle), width (px), left, jp (police japonaise), get(row) (valeur filtrée et triée),
-     show(row) (texte affiché), cls(row) (classe), title(row) (bulle de la cellule), onclick(row) (cellule cliquable).
+     show(row) (texte affiché), cls(row) (classe), style(row) (style de la cellule), big (texte plus grand), title(row) (bulle de la cellule),
+     onclick(row) (cellule cliquable), btn(row) -> {label,on}|null (un bouton dans la cellule), parts(row) -> [texte,…] (morceaux séparés par ·).
      `result` (bindable) : les lignes filtrées et triées, toutes pages (pour l'export). -->
 <script>
   import Pager from './Pager.svelte';
@@ -89,13 +90,16 @@
         {#each shown as row}
           <tr onclick={onrowclick ? () => onrowclick(row) : null}>
             {#each columns as col (col.key)}
-              <td class={(col.cls ? col.cls(row) : '') + (col.left ? ' left' : '') + (col.jp ? ' jp' : '')}
-                style={col.width ? `width:${col.width}px;max-width:${col.width}px` : ''}
+              <td class={(col.cls ? col.cls(row) : '') + (col.left ? ' left' : '') + (col.jp ? ' jp' : '') + (col.big ? ' big' : '')}
+                style={(col.width ? `width:${col.width}px;max-width:${col.width}px;` : '') + (col.style ? col.style(row) || '' : '')}
                 title={col.title ? col.title(row) : text(col, row)}
                 class:click={!!col.onclick}
                 ondblclick={oncelldblclick ? (e) => oncelldblclick(row, col, e) : null}
                 onclick={col.onclick ? (e) => { e.stopPropagation(); col.onclick(row); } : null}>
-                {#if cell}{@render cell(row, col)}{:else}{text(col, row)}{/if}
+                {#if cell}{@render cell(row, col)}
+                {:else if col.btn}{@const b = col.btn(row)}{#if b}<button type="button" class="cb" class:on={b.on}>{b.label}</button>{/if}
+                {:else if col.parts}{#each col.parts(row) as g}<span class="gl">{g}</span>{/each}
+                {:else}{text(col, row)}{/if}
               </td>
             {/each}
           </tr>
@@ -127,6 +131,10 @@
   td { padding: 6px; border-bottom: 1px solid var(--p2); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   th + th, td + td { border-left: 1px solid var(--p2); }
   td.jp { font-size: 15px; }
+  td.big { font-size: 18px; }
+  .gl + .gl::before { content: '·'; color: var(--m); margin: 0 7px; }
+  .cb { background: var(--p2); color: var(--t); border: 1px solid var(--l); border-radius: 6px; padding: 1px 8px; font-size: 12px; cursor: pointer; }
+  .cb.on { background: var(--a); color: #fff; border-color: var(--a); }
   td.click { cursor: pointer; }
   td.click:hover { text-decoration: underline; }
   td.known { color: var(--g); }
