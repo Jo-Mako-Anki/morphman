@@ -2,8 +2,9 @@
      Le tableau, les filtres et la pagination viennent de lib/DataTable.svelte. -->
 <script>
   import DataTable from '../lib/DataTable.svelte';
+  import Segmented from '../lib/Segmented.svelte';
   import { py, onPy } from '../lib/bridge.js';
-  import { num, loadUi } from '../lib/format.js';
+  import { num, loadUi, ui } from '../lib/format.js';
 
   // Colonnes : [clé, titre, alignement gauche, largeur, filtre, bulle]
   const ALL = [
@@ -33,7 +34,11 @@
   let media = $state('');
   let group = $state('kanji');
   let subs = $state('particles');
-  let on = $state([...SHOWN]);
+  let order = $state(ALL.map((c) => c[0])); // ordre de toutes les colonnes (glisser les en-têtes)
+  let off = $state(ALL.map((c) => c[0]).filter((k) => !SHOWN.includes(k)));
+  const on = $derived(order.filter((k) => !off.includes(k)));
+  let result = $state([]); // lignes filtrées et triées, toutes pages (Export)
+  let fileMsg = $state('');
   let colsOpen = $state(false);
   let marks = $state([]); // statuts changés à la main (appliqués au prochain Recalc)
 
@@ -80,14 +85,21 @@
     forms: (r) => (r.forms || []).join('・'),
     status: (r) => getters.status(r) + (markOf(r) ? ' ●' : ''),
   };
+  const byKey = Object.fromEntries(ALL.map((c) => [c[0], c]));
   const columns = $derived(
-    ALL.filter((c) => on.includes(c[0])).map(([key, lbl, left, width, filter, tip]) => ({
-      key, label: lbl, left: !!left, width, filter, tip, get: getters[key], show: shows[key],
-      onclick: key === 'status' ? (r) => !r.nc && toggleStatus(r) : null,
-    })),
+    on.map((key) => {
+      const [, lbl, left, width, filter, tip] = byKey[key];
+      return {
+        key, label: lbl, left: !!left, width, filter, tip, get: getters[key], show: shows[key],
+        jp: ['word', 'base', 'reading', 'forms'].includes(key),
+        cls: key === 'status' ? (r) => (isKnown(r) ? 'known' : 'new') : null,
+        title: key === 'status' ? (r) => (markOf(r) ? 'Marked by you: applied at the next Recalc. Click to change.' : 'Click to mark it ' + (isKnown(r) ? 'Not known' : 'Known') + ' (applied at the next Recalc).') : null,
+        onclick: key === 'status' ? (r) => !r.nc && toggleStatus(r) : null,
+      };
+    }),
   );
   const rows = $derived(
-    data && data.rows ? data.rows.filter((r) => show === 'all' || (show === 'known') === isKnown(r)) : [],
+    data && data.rows ? data.rows.filter((r) => show === 'all' || (show === 'known') === (r.status === 'known')) : [],
   );
 
   function load() {
@@ -109,38 +121,64 @@
   })]).finally(load);
 
   function toggleCol(k) {
-    on = on.includes(k) ? on.filter((x) => x !== k) : ALL.map((c) => c[0]).filter((x) => x === k || on.includes(x));
-    if (on.includes(k) && data && data.cols && !data.cols.includes(k)) load(); // colonne pas encore envoyée par Python
+    const hide = !off.includes(k);
+    off = hide ? [...off, k] : off.filter((x) => x !== k);
+    if (!hide && data && data.cols && !data.cols.includes(k)) load(); // colonne pas encore envoyée par Python
   }
+  function reorder(from, to) {
+    const rest = order.filter((k) => k !== from), i = rest.indexOf(to);
+    rest.splice(order.indexOf(from) > order.indexOf(to) ? i : i + 1, 0, from);
+    order = rest;
+  }
+  const cellText = (c, r) => String(c.show ? c.show(r) : c.get ? c.get(r) ?? '' : r[c.key] ?? '');
+  async function exportList() {
+    fileMsg = '';
+    const name = 'MorphMan words - ' + (media || 'all media') + ' - ' + group + ' - ' + { learn: 'not known', known: 'known', all: 'all' }[show];
+    const r = await py('wtl_words_export', { name, header: columns.map((c) => c.label), rows: result.map((row) => columns.map((c) => cellText(c, row))) });
+    if (r && r.error) fileMsg = r.error;
+  }
+  async function openFile() {
+    fileMsg = '';
+    const r = await py('words_file', { media, group });
+    if (r && r.error) fileMsg = r.error;
+  }
+  const summary = $derived.by(() => {
+    if (!data || data.error) return '';
+    let t = `${num(data.known, 0)} known · ${num(data.young, 0)} learning`;
+    const need = data.learn_need, tg = Math.round((ui.titles && ui.titles.target) || 85);
+    if (need && data.learn_now != null) {
+      const n = need[tg];
+      t += ` · Now ${num(data.learn_now, 1)} % · ${tg} %: ${n == null ? 'not reachable' : n === 0 ? 'reached' : num(n, 0) + ' words to learn'}`;
+    }
+    return t;
+  });
   const browse = (r, c, e) =>
     py('wtl_browser', { word: c.key === 'base' ? r.base : r.word, pos: r.pos, sub: r.subraw === '*' ? '' : r.subraw, wide: e.shiftKey });
 </script>
 
 <div class="bar">
   <select class="msel" bind:value={media} onchange={load} title="The master frequency list of the whole catalog, or of one type of media (its own ranks and counts).">
-    <option value="">Master list: whole catalog</option>
-    {#each (data && data.all_media) || [] as m}<option value={m}>Master list: {m}</option>{/each}
+    <option value="">All media</option>
+    {#each (data && data.all_media) || [] as m}<option value={m}>{m}</option>{/each}
   </select>
   <button class="btn sm" onclick={gStart} title="How the list groups the written forms and the sub-types">⚙ Grouping: {groupLabel}</button>
-  <span class="seg">
-    {#each [['learn', 'Not known'], ['known', 'Known'], ['all', 'All']] as [v, t]}
-      <button class="btn sm" class:on={show === v} onclick={() => (show = v)}>{t}</button>
-    {/each}
-  </span>
+  <Segmented bind:value={show} options={[['learn', 'Not known'], ['known', 'Known'], ['all', 'All']]} />
   <input class="search" placeholder="Search a word…" bind:value={q} oninput={typed} onkeydown={(e) => e.key === 'Enter' && load()} />
-  <select class="msel" title="Search mode" bind:value={exact} onchange={() => q.trim() && load()}>
-    <option value={false}>Contains</option><option value={true}>Equals</option>
-  </select>
+  <Segmented bind:value={exact} options={[[false, 'Contains'], [true, 'Equals']]} title="Search mode" onchange={() => q.trim() && load()} />
   <span class="grow"></span>
+  <span class="m small summary">{summary}</span>
   <button class="btn sm" onclick={() => (colsOpen = !colsOpen)}>▦ Columns</button>
+  <button class="btn sm" onclick={exportList} title="Saves the list as shown (filters, sort, columns and the settings above), all pages, to a tab-separated file (Excel, Google Sheets)">⬇ Export…</button>
+  <button class="btn sm" onclick={openFile} title="Opens the master list file of this selection (All the catalog, or the chosen media)">📂 Open file</button>
   {#if colsOpen}
     <div class="cols card">
-      {#each ALL as [k, t]}
-        <label><input type="checkbox" checked={on.includes(k)} onchange={() => toggleCol(k)} /> {t}</label>
+      {#each order as k}
+        <label><input type="checkbox" checked={!off.includes(k)} onchange={() => toggleCol(k)} /> {byKey[k][1]}</label>
       {/each}
     </div>
   {/if}
 </div>
+{#if fileMsg}<div class="m small pad">{fileMsg}</div>{/if}
 
 {#if gOpen}
   <div class="gback" onclick={() => (gOpen = false)} role="presentation"></div>
@@ -169,15 +207,13 @@
 {:else if !data}
   <div class="m pad">Loading words…</div>
 {:else}
-  <div class="m small pad">Known words: {data.known}</div>
-  <DataTable {rows} {columns} noun="words" oncelldblclick={browse} />
+  <DataTable {rows} {columns} noun="words" bind:result oncelldblclick={browse} onreorder={reorder} />
 {/if}
 
 <style>
   .bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative; margin-bottom: 8px; }
   .search { background: var(--bg); color: var(--t); border: 1px solid var(--l); border-radius: 8px; padding: 5px 8px; width: 220px; }
-  .seg { display: inline-flex; gap: 2px; }
-  .seg .on { background: var(--a); color: #0c1020; border-color: var(--a); }
+  .summary { white-space: nowrap; }
   .msel { background: var(--bg); color: var(--t); border: 1px solid var(--l); border-radius: 8px; padding: 5px 8px; }
   .grow { flex: 1; }
   .cols { position: absolute; right: 0; top: 34px; z-index: 10; background: var(--p); border: 1px solid var(--l); border-radius: 10px; padding: 8px 12px; display: grid; gap: 4px; }

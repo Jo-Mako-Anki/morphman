@@ -2,8 +2,9 @@
 import { py } from './bridge.js';
 
 export const format = { decimals: 2, dec: ',', thou: ' ' };
+export const ui = {}; // réglages de l'interface (titles.target…)
 let loaded = null;
-export const loadUi = () => (loaded ||= py('ui').then((u) => { if (u && u.format) Object.assign(format, u.format); return u || {}; }));
+export const loadUi = () => (loaded ||= py('ui').then((u) => { if (u && u.format) Object.assign(format, u.format); Object.assign(ui, u || {}); return u || {}; }));
 
 export function num(t, d = format.decimals) {
   if (t == null || t === '') return '–';

@@ -14,7 +14,9 @@ const reply = {
   ui: () => ({ format: { decimals: 2, dec: ',', thou: ' ' } }),
   word_marks: () => marks,
   ms_info: () => ({ options: { Option_MatchSubPos: 'particles', Option_MatchWritten: 'kanji' } }),
-  words: () => { setTimeout(() => window.onPy({ kind: 'words', data: { rows, known: 12, labels: { noun: 'Noun', verb: 'Verb', adj: 'Adjective', prt: 'Particle', aux: 'Auxiliary verb' }, all_media: ['Anime', 'Manga', 'Visual Novel'], meaning: true, cols: null } }), 150); return null; },
+  words: () => { setTimeout(() => window.onPy({ kind: 'words', data: { rows, known: 12, young: 108, learn_now: 4.4, learn_need: { 85: 52000 }, labels: { noun: 'Noun', verb: 'Verb', adj: 'Adjective', prt: 'Particle', aux: 'Auxiliary verb' }, all_media: ['Anime', 'Manga', 'Visual Novel'], meaning: true, cols: null } }), 150); return null; },
+  wtl_words_export: () => ({}),
+  words_file: () => ({}),
   word_mark: (a) => { const i = marks.findIndex((m) => m.key === a.key); i >= 0 && marks.splice(i, 1); a.state && marks.push(a); return marks; },
 };
 export function installMock() {
